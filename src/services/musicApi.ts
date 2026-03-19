@@ -13,7 +13,7 @@ import type {
   Song,
 } from '../types/music';
 
-const MUSIC_API_BASE_URL = import.meta.env.VITE_MUSIC_API_BASE_URL || 'http://localhost:3000';
+const MUSIC_API_BASE_URL = import.meta.env.VITE_MUSIC_API_BASE_URL || 'http://62.234.71.31:3000';
 
 // Storage key for cookie
 const COOKIE_STORAGE_KEY = 'music_cookie';
