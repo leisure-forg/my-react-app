@@ -10,6 +10,7 @@ export default defineConfig(({mode}) => {
     define: {
       'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
     },
+    // VITE_ prefixed env vars are automatically available via import.meta.env
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),

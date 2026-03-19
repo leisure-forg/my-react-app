@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Screen } from './types';
-import { TopAppBar, BottomNavBar } from './components/Navigation';
+import { BottomNavBar } from './components/Navigation';
 import { RoadmapScreen } from './components/RoadmapScreen';
 import { WorldScreen } from './components/WorldScreen';
 import { GamesScreen } from './components/GamesScreen';
@@ -30,8 +30,8 @@ export default function App() {
 
   return (
     <div className="relative flex min-h-screen w-full flex-col max-w-[430px] mx-auto bg-background-dark border-x border-border-muted shadow-2xl overflow-hidden">
-      <TopAppBar />
-      
+      {/* Removed TopAppBar - no more "KINETIC PATH" header blocking content */}
+
       <div className="flex-1 relative">
         <AnimatePresence mode="wait">
           <motion.div
@@ -47,9 +47,9 @@ export default function App() {
         </AnimatePresence>
       </div>
 
-      <BottomNavBar 
-        activeScreen={activeScreen} 
-        onScreenChange={setActiveScreen} 
+      <BottomNavBar
+        activeScreen={activeScreen}
+        onScreenChange={setActiveScreen}
       />
 
       {/* Dynamic Notch (iPhone feel) */}

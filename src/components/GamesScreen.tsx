@@ -1,83 +1,163 @@
-import React from 'react';
-import { GAMES } from '../constants';
-import { Search, Star } from 'lucide-react';
-import { motion } from 'motion/react';
+import React, { useState } from 'react';
+import { Search, Star, Gamepad2, Trophy } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+import { Game2048, SnakeGame, TicTacToe, MemoryGame } from './games';
+
+interface PlayableGame {
+  id: string;
+  title: string;
+  category: string;
+  description: string;
+  color: string;
+  icon: React.ReactNode;
+  component: React.FC<{ onClose: () => void }>;
+}
+
+const PLAYABLE_GAMES: PlayableGame[] = [
+  {
+    id: '2048',
+    title: '2048',
+    category: 'Puzzle',
+    description: 'Join tiles and get to 2048',
+    color: 'from-amber-400 to-orange-500',
+    icon: <span className="text-2xl font-black">2048</span>,
+    component: Game2048,
+  },
+  {
+    id: 'snake',
+    title: 'Snake',
+    category: 'Arcade',
+    description: 'Classic snake game',
+    color: 'from-green-400 to-emerald-600',
+    icon: <span className="text-2xl">🐍</span>,
+    component: SnakeGame,
+  },
+  {
+    id: 'tictactoe',
+    title: 'Tic Tac Toe',
+    category: 'Logic',
+    description: 'Beat the CPU',
+    color: 'from-blue-400 to-indigo-600',
+    icon: <span className="text-2xl">⭕</span>,
+    component: TicTacToe,
+  },
+  {
+    id: 'memory',
+    title: 'Memory Match',
+    category: 'Puzzle',
+    description: 'Find matching pairs',
+    color: 'from-purple-400 to-pink-600',
+    icon: <span className="text-2xl">🎴</span>,
+    component: MemoryGame,
+  },
+];
 
 export const GamesScreen: React.FC = () => {
+  const [selectedGame, setSelectedGame] = useState<PlayableGame | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState('All');
+
+  const categories = ['All', ...Array.from(new Set(PLAYABLE_GAMES.map(g => g.category)))];
+  const filteredGames = selectedCategory === 'All'
+    ? PLAYABLE_GAMES
+    : PLAYABLE_GAMES.filter(g => g.category === selectedCategory);
+
+  const GameComponent = selectedGame?.component;
+
   return (
-    <div className="flex flex-col h-full bg-background-dark overflow-y-auto hide-scrollbar pb-32 pt-20">
-      <div className="px-5 py-2">
-        <div className="relative group">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary transition-colors size-5" />
-          <input 
-            className="w-full h-12 pl-12 pr-4 rounded-2xl border-none bg-surface-container focus:ring-2 focus:ring-primary/50 text-base placeholder:text-on-surface-variant/50 transition-all" 
-            placeholder="Find a game..." 
-            type="text"
-          />
-        </div>
-      </div>
-
-      <div className="flex gap-3 px-5 py-4 overflow-x-auto hide-scrollbar">
-        {['All', 'Puzzle', 'Arcade', 'Logic', 'Strategy'].map((cat, idx) => (
-          <button 
-            key={cat}
-            className={`flex h-9 shrink-0 items-center justify-center px-5 rounded-full text-sm font-semibold transition-all ${
-              idx === 0 ? 'bg-primary text-white glow-shadow' : 'bg-surface-container text-on-surface-variant border border-transparent hover:border-primary/30'
-            }`}
-          >
-            {cat}
-          </button>
-        ))}
-      </div>
-
-      <main className="flex-1 px-5">
-        <section className="mb-8">
-          <h2 className="text-lg font-bold mb-4 flex items-center gap-2 font-headline uppercase tracking-wider">
-            <Star className="text-primary size-5 fill-primary" />
-            Featured Today
-          </h2>
-          <motion.div 
-            whileHover={{ scale: 1.02 }}
-            className="relative w-full aspect-[16/9] rounded-3xl overflow-hidden bg-gradient-to-br from-primary to-orange-600 group shadow-lg"
-          >
-            <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors"></div>
-            <div className="absolute inset-0 p-6 flex flex-col justify-end">
-              <span className="bg-white/20 backdrop-blur-md text-white text-[10px] font-bold uppercase tracking-widest w-fit px-2 py-1 rounded mb-2">New Release</span>
-              <h3 className="text-2xl font-black text-white leading-tight font-headline">Neon Runner: <br/>Infinite</h3>
-              <div className="flex items-center justify-between mt-4">
-                <p className="text-white/80 text-sm font-medium">1.2M Players this week</p>
-                <button className="bg-white text-primary font-bold px-6 py-2 rounded-full shadow-lg active:scale-95 transition-transform">Play Now</button>
-              </div>
+    <>
+      <div className="flex flex-col h-full bg-background-dark overflow-y-auto hide-scrollbar pb-32 pt-20">
+        {/* Header */}
+        <div className="px-5 py-4">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-orange-600 flex items-center justify-center shadow-lg glow-shadow">
+              <Gamepad2 className="text-white size-6" />
             </div>
-          </motion.div>
-        </section>
+            <div>
+              <h1 className="text-2xl font-black text-white font-headline">Arcade</h1>
+              <p className="text-sm text-on-surface-variant">{PLAYABLE_GAMES.length} games available</p>
+            </div>
+          </div>
 
-        <section>
-          <h2 className="text-lg font-bold mb-4 font-headline uppercase tracking-wider">All Mini-Games</h2>
+          <div className="relative group">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary transition-colors size-5" />
+            <input
+              className="w-full h-12 pl-12 pr-4 rounded-2xl border-none bg-surface-container focus:ring-2 focus:ring-primary/50 text-base placeholder:text-on-surface-variant/50 transition-all"
+              placeholder="Search games..."
+              type="text"
+            />
+          </div>
+        </div>
+
+        {/* Categories */}
+        <div className="flex gap-3 px-5 py-2 overflow-x-auto hide-scrollbar">
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setSelectedCategory(cat)}
+              className={`flex h-9 shrink-0 items-center justify-center px-5 rounded-full text-sm font-semibold transition-all ${
+                selectedCategory === cat ? 'bg-primary text-white glow-shadow' : 'bg-surface-container text-on-surface-variant border border-transparent hover:border-primary/30'
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+
+        {/* Stats Banner */}
+        <div className="mx-5 mt-4 p-4 rounded-2xl bg-gradient-to-br from-primary/20 to-orange-600/20 border border-primary/20">
+          <div className="flex items-center gap-3">
+            <Trophy className="text-primary size-8" />
+            <div>
+              <p className="text-sm font-bold text-white">Ready to Play?</p>
+              <p className="text-xs text-on-surface-variant">Choose a game below to start</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Games Grid */}
+        <main className="flex-1 px-5 py-6">
+          <h2 className="text-lg font-bold mb-4 font-headline uppercase tracking-wider text-on-surface">
+            {selectedCategory === 'All' ? 'All Games' : selectedCategory}
+          </h2>
           <div className="grid grid-cols-2 gap-4">
-            {GAMES.map((game) => (
-              <motion.div 
+            {filteredGames.map((game) => (
+              <motion.button
                 key={game.id}
-                whileHover={{ y: -5 }}
-                className="bg-surface-container-low p-3 rounded-[2rem] border border-white/5 flex flex-col gap-3 group transition-all hover:border-primary/40"
+                onClick={() => setSelectedGame(game)}
+                whileHover={{ y: -5, scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="bg-surface-container-low p-4 rounded-[1.5rem] border border-white/5 flex flex-col gap-3 transition-all hover:border-primary/40 text-left"
               >
-                <div className={`aspect-square rounded-2xl bg-gradient-to-tr ${game.color} flex items-center justify-center relative overflow-hidden`}>
-                  <span className="text-4xl font-black text-black/20 drop-shadow-sm font-headline">{game.title.split(' ')[0]}</span>
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors"></div>
+                <div className={`aspect-square rounded-2xl bg-gradient-to-tr ${game.color} flex items-center justify-center relative overflow-hidden shadow-lg`}>
+                  {game.icon}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
                 </div>
-                <div className="px-1">
-                  <h4 className="font-bold text-base truncate font-headline">{game.title}</h4>
-                  <div className="flex items-center gap-1 mb-3">
-                    <span className="text-[10px] font-bold text-primary uppercase">{game.stats.label}:</span>
-                    <p className="text-[11px] font-bold text-on-surface-variant font-label tracking-tighter uppercase">{game.stats.value}</p>
-                  </div>
-                  <button className="w-full bg-primary py-2.5 rounded-xl text-white font-black text-sm active:scale-90 transition-all uppercase tracking-widest shadow-lg hover:shadow-primary/20">PLAY</button>
+                <div>
+                  <h4 className="font-bold text-base truncate font-headline text-white">{game.title}</h4>
+                  <p className="text-xs text-on-surface-variant truncate">{game.description}</p>
+                  <span className="inline-block mt-2 text-[10px] font-bold text-primary uppercase bg-primary/10 px-2 py-1 rounded-full">
+                    {game.category}
+                  </span>
                 </div>
-              </motion.div>
+              </motion.button>
             ))}
           </div>
-        </section>
-      </main>
-    </div>
+        </main>
+      </div>
+
+      {/* Game Modal */}
+      <AnimatePresence>
+        {GameComponent && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <GameComponent onClose={() => setSelectedGame(null)} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 };
